@@ -15,12 +15,3 @@ class Item(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.user.username})"
-
-
-class encryptionKey(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    key = models.TextField()
-
-
-    def __str__(self):
-        return f"Encryption Key for {self.user.username}"

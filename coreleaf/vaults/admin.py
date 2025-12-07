@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Item, encryptionKey
+from .models import Item
 
 
 admin.site.register(Item)
-admin.site.register(encryptionKey)
