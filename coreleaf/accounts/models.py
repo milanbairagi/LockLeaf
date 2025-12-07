@@ -6,7 +6,7 @@ class User(AbstractUser):
     pass
 
 
-class encryptionKey(models.Model):
+class EncryptionKey(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     key = models.CharField(max_length=255)
 
