@@ -1,4 +1,4 @@
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -76,6 +76,48 @@ class VaultListCreateView(ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+
+class RetrieveUpdateVaultView(RetrieveUpdateAPIView):
+    serializer_class = VaultCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        guard, _ = self._vault_unlock_check(self.request)
+        if guard is not None:
+            return guard
+        return Item.objects.filter(user=self.request.user)
+    
+    def _vault_unlock_check(self, request):
+        token = request.headers.get("X-Vault-Unlock-Token")
+        if not token:
+            return Response({"error": "Missing X-Vault-Unlock-Token."}, status=status.HTTP_403_FORBIDDEN), None
+        user_id, vault_key = verify_vault_unlock_token(token)
+        if not user_id or not vault_key:
+            return Response({"error": "Invalid or expired vault unlock token."}, status=status.HTTP_401_UNAUTHORIZED), None
+        if int(user_id) != int(request.user.id):
+            return Response({"error": "Token subject mismatch."}, status=status.HTTP_401_UNAUTHORIZED), None
+        return None, vault_key
+    
+    def retrieve(self, request, *args, **kwargs):
+        guard, vault_key = self._vault_unlock_check(request)
+        if guard is not None:
+            return guard
+        
+        instance = self.get_object()
+        # Decrypt sensitive fields
+        username, password, notes = None, None, None
+        if instance.username: username = decrypt_data(vault_key, instance.username).decode()
+        if instance.password: password = decrypt_data(vault_key, instance.password).decode()
+        if instance.notes: notes = decrypt_data(vault_key, instance.notes).decode()
+
+        serializer = self.get_serializer(instance)
+        # Create a mutable copy and update with decrypted data
+        data = dict(serializer.data)
+        data["username"] = username
+        data["password"] = password
+        data["notes"] = notes
+
+        return Response(data)
 
 class UnlockVaultView(APIView):
     permission_classes = [IsAuthenticated]
