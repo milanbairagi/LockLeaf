@@ -98,6 +98,17 @@ class RetrieveUpdateVaultView(RetrieveUpdateAPIView):
             return Response({"error": "Token subject mismatch."}, status=status.HTTP_401_UNAUTHORIZED), None
         return None, vault_key
     
+    def _get_serialized_data_with_decryption(self, serializer, vault_key):
+        data = dict(serializer.data)
+        # Decrypt sensitive fields
+        if serializer.instance.username:
+            data["username"] = decrypt_data(vault_key, serializer.instance.username).decode()
+        if serializer.instance.password:
+            data["password"] = decrypt_data(vault_key, serializer.instance.password).decode()
+        if serializer.instance.notes:
+            data["notes"] = decrypt_data(vault_key, serializer.instance.notes).decode()
+        return data
+    
     def retrieve(self, request, *args, **kwargs):
         guard, vault_key = self._vault_unlock_check(request)
         if guard is not None:
@@ -112,12 +123,39 @@ class RetrieveUpdateVaultView(RetrieveUpdateAPIView):
 
         serializer = self.get_serializer(instance)
         # Create a mutable copy and update with decrypted data
-        data = dict(serializer.data)
-        data["username"] = username
-        data["password"] = password
-        data["notes"] = notes
+        data = self._get_serialized_data_with_decryption(serializer, vault_key)
 
         return Response(data)
+    
+    def update(self, request, *args, **kwargs):
+        guard, vault_key = self._vault_unlock_check(request)
+        if guard is not None:
+            return guard
+        
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+
+        username = request.data.pop("username", None)
+        password = request.data.pop("password", None)
+        notes = request.data.pop("notes", None)
+
+        encrypted_username = encrypt_data(vault_key, username.encode()) if username is not None else instance.username
+        encrypted_password = encrypt_data(vault_key, password.encode()) if password is not None else instance.password
+        encrypted_notes = encrypt_data(vault_key, notes.encode()) if notes is not None else instance.notes
+
+        serializer = self.get_serializer(instance, data={
+                                        **request.data,
+                                        "username": encrypted_username,
+                                        "password": encrypted_password,
+                                        "notes": encrypted_notes,
+                                    }, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        response_data = self._get_serialized_data_with_decryption(serializer, vault_key)
+        
+        return Response(response_data)
+    
 
 class UnlockVaultView(APIView):
     permission_classes = [IsAuthenticated]
