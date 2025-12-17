@@ -10,7 +10,7 @@ from accounts.models import EncryptionKey
 from .serializers import VaultCreateSerializer, VaultListSerializer
 from .models import Item
 from .vault_token import issue_vault_unlock_token, verify_vault_unlock_token
-from .encryption import encrypt_data
+from .encryption import encrypt_data, decrypt_data
 
 
 class VaultListCreateView(ListCreateAPIView):
@@ -36,10 +36,19 @@ class VaultListCreateView(ListCreateAPIView):
         return None, vault_key
 
     def list(self, request, *args, **kwargs):
-        guard, _  = self._vault_unlock_check(request)
+        guard, vault_key  = self._vault_unlock_check(request)
         if guard is not None:
             return guard
-        return super().list(request, *args, **kwargs)
+        
+        queryset = self.filter_queryset(self.get_queryset())
+        # Decrypt usernames before serialization
+        for item in queryset:
+            if item.username:
+                item.username = decrypt_data(vault_key, item.username).decode()
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+            
 
     def create(self, request, *args, **kwargs):
         guard, vault_key = self._vault_unlock_check(request)

@@ -11,4 +11,4 @@ class VaultCreateSerializer(ModelSerializer):
 class VaultListSerializer(ModelSerializer):
     class Meta:
         model = Item
-        fields = ["id", "title", "url", "created_at", "updated_at"]
+        fields = ["id", "title", "username", "url", "created_at", "updated_at"]
