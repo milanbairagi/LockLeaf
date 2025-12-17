@@ -1,7 +1,6 @@
 import secrets
 import base64
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives import hashes
 
 
 def encrypt_data(vault_key: bytes, plaintext: bytes) -> str:
