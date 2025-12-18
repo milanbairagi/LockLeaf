@@ -208,4 +208,6 @@ __marimo__/
 
 
 # Development testing files
-dev_testing/
+dev_testing/*.local.http
+dev_testing/example.local.http
+
