@@ -1,0 +1,140 @@
+### LockLeaf API (VS Code REST Client)
+#
+# This file is intended to be committed and shared.
+# - No real tokens are stored here.
+# - Values like username/password are placeholders.
+# - Tokens are captured from API responses at runtime.
+#
+# Requirements:
+# - VS Code extension: "REST Client" (Huachao Mao)
+# - Django server running locally (default): http://localhost:8000/
+
+@url = http://localhost:8000/
+
+# -------------------------
+# Demo credentials (edit)
+# -------------------------
+
+@username = your_username_here
+@password = your_password_here
+@master_password = your_master_password_here
+
+# =====================================================================
+# 1) Accounts
+# =====================================================================
+
+### Register (run once)
+# Note: If the user already exists, this may return 400.
+# @name register
+POST {{url}}accounts/register/
+Content-Type: application/json
+
+{
+	"username": "{{username}}",
+	"password": "{{password}}"
+}
+
+
+### Obtain JWT access/refresh tokens
+# @name token
+POST {{url}}accounts/token/
+Content-Type: application/json
+
+{
+	"username": "{{username}}",
+	"password": "{{password}}"
+}
+
+### Capture tokens from the previous response
+@access = {{token.response.body.access}}
+@refresh = {{token.response.body.refresh}}
+
+
+### Refresh access token
+# @name token_refresh
+POST {{url}}accounts/token/refresh/
+Content-Type: application/json
+
+{
+	"refresh": "{{refresh}}"
+}
+
+
+### Get current user profile
+GET {{url}}accounts/me/
+Authorization: Bearer {{access}}
+
+
+### Set master key (one-time per user)
+# This stores an encrypted vault key for the authenticated user.
+# If already set, the API returns 400: {"error": "Master key already set."}
+POST {{url}}accounts/master-key/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{
+	"master_key": "{{master_password}}"
+}
+
+
+# =====================================================================
+# 2) Vault unlock (required before vault item operations)
+# =====================================================================
+
+### Unlock vault (returns a short-lived vault unlock token)
+# @name unlock
+POST {{url}}vaults/unlock/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{
+	"master_password": "{{master_password}}"
+}
+
+### Capture vault unlock token
+@vault_unlock_token = {{unlock.response.body.vault_unlock_token}}
+
+
+# =====================================================================
+# 3) Vault items
+# =====================================================================
+
+### List vault items
+GET {{url}}vaults/list-create/
+Authorization: Bearer {{access}}
+X-Vault-Unlock-Token: {{vault_unlock_token}}
+
+
+### Create vault item
+POST {{url}}vaults/list-create/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+X-Vault-Unlock-Token: {{vault_unlock_token}}
+
+{
+	"title": "My Email Account",
+	"username": "myemail@example.com",
+	"password": "emailpassword123",
+	"url": "https://mail.example.com",
+	"notes": "This is my primary email account."
+}
+
+
+### Retrieve vault item
+# Replace `2` with the item id you want to fetch.
+GET {{url}}vaults/retrieve-update/2/
+Authorization: Bearer {{access}}
+X-Vault-Unlock-Token: {{vault_unlock_token}}
+
+
+### Update vault item (partial)
+# Replace `2` with the item id you want to update.
+PATCH {{url}}vaults/retrieve-update/2/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+X-Vault-Unlock-Token: {{vault_unlock_token}}
+
+{
+	"password": "newemailpassword123"
+}
+
