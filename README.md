@@ -4,6 +4,9 @@ LockLeaf is a self-hosted password manager backend built with Django + Django RE
 
 Only the backend API exists right now. A Chrome extension and mobile app client are planned for the future.
 
+## Other Resoruce
+[Chrome Extension](https://github.com/milanbairagi/leaflock-chrome-extension)
+
 ## What’s implemented
 
 - User accounts (custom `User` model)
