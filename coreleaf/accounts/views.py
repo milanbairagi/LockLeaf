@@ -1,6 +1,7 @@
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 from .models import User, EncryptionKey
 from .encryption import encrypt_vault_key, decrypt_vault_key
@@ -14,18 +15,21 @@ class UserCreateView(CreateAPIView):
 class UserRetrieveUpdate(RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class UserProfile(RetrieveUpdateAPIView):
     """View to retrieve and update the authenticated user's profile."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
 
 class MasterKeyView(APIView):
+    permission_classes = [IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
         """Store the vault_key (encrypted) for the authenticated user using master key."""
