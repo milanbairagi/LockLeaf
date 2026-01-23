@@ -30,6 +30,12 @@ class UserProfile(RetrieveUpdateAPIView):
 
 class MasterKeyView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        """Return whether the authenticated user has a master key set."""
+        has_key = EncryptionKey.objects.filter(user=request.user).exists()
+        return Response({"has_master_key": has_key}, status=200)
+
     
     def post(self, request, *args, **kwargs):
         """Store the vault_key (encrypted) for the authenticated user using master key."""
