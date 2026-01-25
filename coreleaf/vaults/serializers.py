@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from .models import Item
 
@@ -12,3 +13,8 @@ class VaultListSerializer(ModelSerializer):
     class Meta:
         model = Item
         fields = ["id", "title", "username", "url", "created_at", "updated_at"]
+
+
+class UnlockVaultInputSerializer(serializers.Serializer):
+    """Serializer for unlocking vault."""
+    master_password = serializers.CharField(required=True, help_text="Master password to unlock vault")

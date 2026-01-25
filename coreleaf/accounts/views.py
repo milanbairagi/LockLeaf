@@ -2,7 +2,8 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserSerializer
+from drf_spectacular.utils import extend_schema
+from .serializers import UserSerializer, MasterKeyInputSerializer
 from .models import User, EncryptionKey
 from .encryption import encrypt_vault_key, decrypt_vault_key
 
@@ -31,11 +32,17 @@ class UserProfile(RetrieveUpdateAPIView):
 class MasterKeyView(APIView):
     permission_classes = [IsAuthenticated]
 
+    
     def get(self, request, *args, **kwargs):
         """Return whether the authenticated user has a master key set."""
         has_key = EncryptionKey.objects.filter(user=request.user).exists()
         return Response({"has_master_key": has_key}, status=200)
 
+    @extend_schema(
+        request=MasterKeyInputSerializer,
+        responses={201: None, 400: None, 401: None},
+        description="Store the vault_key (encrypted) for the authenticated user using master key."
+    )
     
     def post(self, request, *args, **kwargs):
         """Store the vault_key (encrypted) for the authenticated user using master key."""

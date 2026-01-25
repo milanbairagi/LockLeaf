@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from cryptography.exceptions import InvalidTag
+from drf_spectacular.utils import extend_schema
 
 from accounts.encryption import decrypt_vault_key
 from accounts.models import EncryptionKey
-from .serializers import VaultCreateSerializer, VaultListSerializer
+from .serializers import VaultCreateSerializer, VaultListSerializer, UnlockVaultInputSerializer
 from .models import Item
 from .vault_token import issue_vault_unlock_token, verify_vault_unlock_token
 from .encryption import encrypt_data, decrypt_data
@@ -160,6 +161,12 @@ class RetrieveUpdateVaultView(RetrieveUpdateAPIView):
 class UnlockVaultView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=UnlockVaultInputSerializer,
+        responses={200: None, 400: None, 401: None, 404: None},
+        description="Unlock vault using master password and get vault unlock token."
+    )
+    
     def post(self, request, *args, **kwargs):
         master_password = request.data.get("master_password")
         if not master_password:
