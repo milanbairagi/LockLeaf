@@ -65,6 +65,12 @@ GET {{url}}accounts/me/
 Authorization: Bearer {{access}}
 
 
+### Check if master key is set
+# @name check_master_key
+GET {{url}}accounts/master-key/
+Authorization: Bearer {{access}}
+
+
 ### Set master key (one-time per user)
 # This stores an encrypted vault key for the authenticated user.
 # If already set, the API returns 400: {"error": "Master key already set."}
