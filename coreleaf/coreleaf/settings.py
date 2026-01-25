@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "accounts",
     "vaults",
+
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -81,7 +83,8 @@ WSGI_APPLICATION = 'coreleaf.wsgi.application'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 
@@ -127,6 +130,15 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+
+# DRF Spectacular Settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'LockLeaf API',
+    'DESCRIPTION': 'API documentation for LockLeaf - a secure vault management system.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 
 # Static files (CSS, JavaScript, Images)
