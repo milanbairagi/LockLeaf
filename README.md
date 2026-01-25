@@ -22,6 +22,7 @@ Only the backend API exists right now. A Chrome extension and mobile app client 
 - SimpleJWT (`djangorestframework_simplejwt`)
 - SQLite (dev)
 - `cryptography`
+- `drf-spectacular`
 
 ## Local setup (Windows / PowerShell)
 
@@ -58,6 +59,12 @@ The API will be available at `http://localhost:8000/`.
 ## API overview
 
 Base URL: `http://localhost:8000/`
+
+### API docs
+
+- OpenAPI schema (JSON): `http://localhost:8000/api/schema/`
+- Swagger UI: `http://localhost:8000/api/schema/swagger-ui/`
+- ReDoc: `http://localhost:8000/api/schema/redoc/`
 
 ### Accounts
 
