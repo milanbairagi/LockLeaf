@@ -3,6 +3,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from cryptography.exceptions import InvalidTag
 from drf_spectacular.utils import extend_schema
 
@@ -36,6 +39,8 @@ class VaultListCreateView(ListCreateAPIView):
             return Response({"error": "Token subject mismatch."}, status=status.HTTP_401_UNAUTHORIZED), None
         return None, vault_key
 
+    @method_decorator(vary_on_headers("Authorization", "X-Vault-Unlock-Token"))
+    @method_decorator(cache_page(60 * 15, key_prefix="vault-list"))
     def list(self, request, *args, **kwargs):
         guard, vault_key  = self._vault_unlock_check(request)
         if guard is not None:
