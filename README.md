@@ -28,27 +28,44 @@ Only the backend API exists right now. A Chrome extension and mobile app client 
 
 From the repo root:
 
-1) Create and activate a virtual environment
+### 1) Create and activate a virtual environment
 
 ```powershell
 cd coreleaf
 py -m venv .venv
-.\.venv\Scripts\activate
+.\.venv\Scripts\activate  # On Mac or Linux: source .venv/bin/activate
 ```
 
-2) Install dependencies
+### 2) Install dependencies
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-3) Run migrations
+### 3) Environment Setup
+Create a `.env` file inside `coreleaf/` directory:
+```ini
+DJANGO_SECRET_KEY=your-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+CORS_ALLOWED_ORIGINS=http://localhost:5173
+VAULT_UNLOCK_SECRET=your-secret-key
+USE_REDIS_CACHE=False
+REDIS_CACHE_URL=127.0.0.1:6379
+```
+Replace `your-secret-key` with a secure random key. Generate using:
+```powershell
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+__Make sure to generate a unique `VAULT_UNLOCK_SECRET` that is different from `DJANGO_SECRET_KEY`.__
+
+### 4) Run migrations
 
 ```powershell
 py manage.py migrate
 ```
 
-4) Start the dev server
+### 5) Start the dev server
 
 ```powershell
 py manage.py runserver
