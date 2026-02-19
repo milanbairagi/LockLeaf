@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from corsheaders.defaults import default_headers
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s)aymfnjcu_pj4dk0ps)z$s=jt_biuy1!a2u=o!c%*7-amm7$x'
-VAULT_UNLOCK_SECRET = "+4um$h2x=9$$9_(8(c@o8b^c0^3aw)bu1&k7l+itgk692##9yj"
+SECRET_KEY = config("DJANGO_SECRET_KEY", default=None)
+VAULT_UNLOCK_SECRET = config("VAULT_UNLOCK_SECRET", default=None)
+
+if not SECRET_KEY:
+    raise ValueError("The DJANGO_SECRET_KEY environment variable is not set.")
+
+if not VAULT_UNLOCK_SECRET:
+    raise ValueError("The VAULT_UNLOCK_SECRET environment variable is not set.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
 
 
 # Application definition
@@ -131,17 +138,22 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+if config("USE_REDIS_CACHE", default=False, cast=bool):
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
         }
     }
-}
-
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
 
 # DRF Spectacular Settings
 SPECTACULAR_SETTINGS = {
