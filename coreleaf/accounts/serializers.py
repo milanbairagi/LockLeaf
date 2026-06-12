@@ -11,13 +11,3 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-
-
-class MasterKeyInputSerializer(serializers.Serializer):
-    """Serializer for setting master key."""
-    master_key = serializers.CharField(required=True, help_text="Master key to encrypt the vault key")
-
-
-class MasterKeyOutputSerializer(serializers.Serializer):
-    """Serializer for retrieving master key status."""
-    has_master_key = serializers.BooleanField(help_text="Indicates if the user has a master key set")
