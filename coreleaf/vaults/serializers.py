@@ -1,20 +1,8 @@
-from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from .models import Item
 
 
-class VaultCreateSerializer(ModelSerializer):
+class VaultSerializer(ModelSerializer):
     class Meta:
         model = Item
         fields = ["id", "title", "user", "username", "password", "url", "notes", "created_at", "updated_at"]
-
-
-class VaultListSerializer(ModelSerializer):
-    class Meta:
-        model = Item
-        fields = ["id", "title", "username", "url", "created_at", "updated_at"]
-
-
-class UnlockVaultInputSerializer(serializers.Serializer):
-    """Serializer for unlocking vault."""
-    master_password = serializers.CharField(required=True, help_text="Master password to unlock vault")
