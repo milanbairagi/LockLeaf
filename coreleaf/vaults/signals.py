@@ -6,7 +6,5 @@ from django.core.cache import cache
 
 @receiver([post_save, post_delete], sender=Item)
 def invalidate_vault_list_cache(sender, instance, **kwargs):
-    print("Clearing vault item list cache")
-
     # cache.delete_pattern("*vault-list*")
     cache.delete(f"vault-blob-list-user-{instance.user.id}")
