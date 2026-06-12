@@ -1,6 +1,7 @@
 from pathlib import Path
 from corsheaders.defaults import default_headers
 from decouple import config, Csv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,3 +147,8 @@ CORS_ALLOW_HEADERS = (
     *default_headers,
     "X-Vault-Unlock-Token"
 )
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=15)
+}
