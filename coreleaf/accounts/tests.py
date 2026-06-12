@@ -7,7 +7,6 @@ from accounts.models import User
 class UserAPITestCase(APITestCase):
     def setUp(self):
         self.user_data = {
-            "username": "testuser",
             "email": "test@example.com",
             "password": "testpassword",
             "first_name": "Test",
@@ -32,7 +31,6 @@ class UserAPITestCase(APITestCase):
     def test_user_registration(self):
         response = self.client.post(self.create_url, self.user_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["username"], self.user_data["username"])
         self.assertEqual(response.data["email"], self.user_data["email"])
 
     def test_user_profile_retrieval(self):
@@ -45,7 +43,6 @@ class UserAPITestCase(APITestCase):
         # Now retrieve the user profile
         response = self.client.get(self.profile_url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["username"], self.user_data["username"])
         self.assertEqual(response.data["email"], self.user_data["email"])
         self.assertEqual(response.data["first_name"], self.user_data["first_name"])
         self.assertEqual(response.data["last_name"], self.user_data["last_name"])
