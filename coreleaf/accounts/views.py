@@ -13,12 +13,6 @@ class UserCreateView(CreateAPIView):
     serializer_class = UserSerializer
 
 
-class UserRetrieveUpdate(RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-
-
 class UserProfile(RetrieveUpdateAPIView):
     """View to retrieve and update the authenticated user's profile."""
     queryset = User.objects.all()
