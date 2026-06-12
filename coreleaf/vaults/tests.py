@@ -11,8 +11,8 @@ class VaultBlobListCreateViewTests(APITestCase):
 
     def setUp(self):
         """Set up test data"""
-        self.user = User.objects.create_user(username="testuser", password="testpass123")
-        self.other_user = User.objects.create_user(username="otheruser", password="testpass123")
+        self.user = User.objects.create_user(email="testuser@example.com", password="testpass123")
+        self.other_user = User.objects.create_user(email="otheruser@example.com", password="testpass123")
         self.url = reverse("vault-blob-list-create")
         
         self.item1_data = {"title": "test item 1", "username": "user1", "password": "pass1", "url":"https://example1.com", "notes": "notes1"}
