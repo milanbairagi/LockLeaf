@@ -6,3 +6,4 @@ class VaultSerializer(ModelSerializer):
     class Meta:
         model = Item
         fields = ["id", "title", "user", "username", "password", "url", "notes", "created_at", "updated_at"]
+        read_only_fields = ["user", "created_at", "updated_at"]
