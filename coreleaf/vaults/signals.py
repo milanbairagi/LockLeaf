@@ -9,4 +9,4 @@ def invalidate_vault_list_cache(sender, instance, **kwargs):
     print("Clearing vault item list cache")
 
     # cache.delete_pattern("*vault-list*")
-    cache.delete(f"vault-list-user-{instance.user.id}")
+    cache.delete(f"vault-blob-list-user-{instance.user.id}")
