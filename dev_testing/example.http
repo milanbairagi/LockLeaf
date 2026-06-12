@@ -15,7 +15,7 @@
 # Demo credentials (edit)
 # -------------------------
 
-@username = your_username_here
+@email = your_email_here
 @password = your_password_here
 
 # =====================================================================
@@ -29,7 +29,7 @@ POST {{url}}accounts/register/
 Content-Type: application/json
 
 {
-	"username": "{{username}}",
+	"email": "{{email}}",
 	"password": "{{password}}"
 }
 
@@ -39,8 +39,7 @@ Content-Type: application/json
 POST {{url}}accounts/token/
 Content-Type: application/json
 
-{
-	"username": "{{username}}",
+	"email": "{{email}}",
 	"password": "{{password}}"
 }
 
