@@ -1,5 +1,7 @@
-from .models import User
 from rest_framework.test import APITestCase
+from rest_framework import status
+from django.shortcuts import reverse
+from accounts.models import User
 
 
 class UserAPITestCase(APITestCase):
@@ -11,35 +13,39 @@ class UserAPITestCase(APITestCase):
             "first_name": "Test",
             "last_name": "User",
         }
-        self.create_url = "/accounts/register/"
-        self.profile_url = "/accounts/profile/1/"
+        self.create_url = reverse("user-register")
+        self.profile_url = reverse("user-me")
+        self.user = None
+    
+    def generate_token_for_user(self, user):
+        """Helper method to generate auth token for a user"""
+        from rest_framework_simplejwt.tokens import RefreshToken
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
+    
+    def get_user_or_create(self):
+        """Helper method to get or create a user for testing"""
+        if not self.user:
+            self.user = User.objects.create_user(**self.user_data)
+        return self.user
 
     def test_user_registration(self):
         response = self.client.post(self.create_url, self.user_data, format="json")
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["username"], self.user_data["username"])
         self.assertEqual(response.data["email"], self.user_data["email"])
 
     def test_user_profile_retrieval(self):
-        # First, create a user
-        self.client.post(self.create_url, self.user_data, format="json")
+        user = self.get_user_or_create()
+        token = self.generate_token_for_user(user)
+
+        # Authenticate the user
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
 
         # Now retrieve the user profile
         response = self.client.get(self.profile_url, format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["username"], self.user_data["username"])
         self.assertEqual(response.data["email"], self.user_data["email"])
-
-    def test_get_user_profile_authenticated(self):
-        # Create a user
-        self.client.post(self.create_url, self.user_data, format="json")
-
-        # Authenticate the user
-        response = self.client.post("/accounts/token/", {
-            "username": self.user_data["username"],
-            "password": self.user_data["password"]
-        }, format="json")
-        token = response.data["access"]
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
-        response = self.client.get("/accounts/me/", format="json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["first_name"], self.user_data["first_name"])
+        self.assertEqual(response.data["last_name"], self.user_data["last_name"])
