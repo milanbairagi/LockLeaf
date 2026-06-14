@@ -5,6 +5,7 @@ from .managers import UserManager
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
+    salt = models.CharField(max_length=30, blank=True, null=True)
 
     objects = UserManager()
 

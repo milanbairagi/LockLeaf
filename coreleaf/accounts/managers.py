@@ -1,4 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
+from secrets import token_urlsafe
 
 
 class UserManager(BaseUserManager):
@@ -6,6 +7,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
+        extra_fields.setdefault("salt", token_urlsafe(16))
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
