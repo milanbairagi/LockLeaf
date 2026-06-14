@@ -7,6 +7,7 @@ class Item(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     username = models.CharField(max_length=255, blank=False, null=True)
     password = models.CharField(max_length=255)
+    iv = models.CharField(max_length=255, blank=True, null=True)
     url = models.URLField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
