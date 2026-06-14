@@ -9,14 +9,14 @@
 # - VS Code extension: "REST Client" (Huachao Mao)
 # - Django server running locally (default): http://localhost:8000/
 
-@url = http://localhost:8000/
+@url=http://localhost:8000/
 
 # -------------------------
 # Demo credentials (edit)
 # -------------------------
 
-@email = your_email_here
-@password = your_password_here
+@email=your_email_here
+@password=your_password_here
 
 # =====================================================================
 # 1) Accounts
@@ -29,24 +29,23 @@ POST {{url}}accounts/register/
 Content-Type: application/json
 
 {
-	"email": "{{email}}",
-	"password": "{{password}}"
+    "email": "{{email}}",
+    "password": "{{password}}"
 }
-
 
 ### Obtain JWT access/refresh tokens
 # @name token
 POST {{url}}accounts/token/
 Content-Type: application/json
 
-	"email": "{{email}}",
-	"password": "{{password}}"
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
 }
 
 ### Capture tokens from the previous response
 @access = {{token.response.body.access}}
 @refresh = {{token.response.body.refresh}}
-
 
 ### Refresh access token
 # @name token_refresh
@@ -54,14 +53,16 @@ POST {{url}}accounts/token/refresh/
 Content-Type: application/json
 
 {
-	"refresh": "{{refresh}}"
+    "refresh": "{{refresh}}"
 }
-
 
 ### Get current user profile
 GET {{url}}accounts/me/
 Authorization: Bearer {{access}}
 
+### Get user salt
+GET {{url}}accounts/salt/
+Authorization: Bearer {{access}}
 
 ### List vault blobs
 GET {{url}}vaults/blobs/
@@ -73,9 +74,9 @@ Content-Type: application/json
 Authorization: Bearer {{access}}
 
 {
-	"title": "My Bank Account",
-	"username": "mybankuser",
-	"password": "bankpassword123",
-	"url": "https://bank.example.com",
-	"notes": "This is my primary bank account."
+    "title": "My Bank Account",
+    "username": "mybankuser",
+    "password": "bankpassword123",
+    "url": "https://bank.example.com",
+    "notes": "This is my primary bank account."
 }
