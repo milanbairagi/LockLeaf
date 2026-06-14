@@ -32,6 +32,7 @@ class UserAPITestCase(APITestCase):
         response = self.client.post(self.create_url, self.user_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["email"], self.user_data["email"])
+        self.assertTrue(response.data["salt"])
 
     def test_user_profile_retrieval(self):
         user = self.get_user_or_create()
@@ -46,3 +47,16 @@ class UserAPITestCase(APITestCase):
         self.assertEqual(response.data["email"], self.user_data["email"])
         self.assertEqual(response.data["first_name"], self.user_data["first_name"])
         self.assertEqual(response.data["last_name"], self.user_data["last_name"])
+        self.assertTrue(response.data["salt"])
+
+    def test_salt_view_is_read_only(self):
+        user = self.get_user_or_create()
+        token = self.generate_token_for_user(user)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
+
+        response = self.client.get(reverse("user-salt"), format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["salt"])
+
+        response = self.client.post(reverse("user-salt"), {"salt": "new-salt"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
