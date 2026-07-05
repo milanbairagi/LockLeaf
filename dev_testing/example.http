@@ -64,19 +64,24 @@ Authorization: Bearer {{access}}
 GET {{url}}accounts/salt/
 Authorization: Bearer {{access}}
 
-### List vault blobs
-GET {{url}}vaults/blobs/
-Authorization: Bearer {{access}}
-
 ### Create vault blob
 POST {{url}}vaults/blobs/
 Content-Type: application/json
 Authorization: Bearer {{access}}
 
 {
-    "title": "My Bank Account",
-    "username": "mybankuser",
-    "password": "bankpassword123",
-    "url": "https://bank.example.com",
-    "notes": "This is my primary bank account."
+    "encrypted_blob": "your_encrypted_blob_here",
+    "iv": "faedffasdfadasdfasdf",
+    "vault_version": 1
+}
+
+### Update vault blob
+PUT {{url}}vaults/blobs/sync/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "encrypted_blob": "ewogICJuYW1lIjogIlBlcnNvbiIsCiAgImdlbmRlciI6ICJNYWxlIgp9=",
+    "iv": "new_iv_but_it_can't_be_changed",
+    "vault_version": 1
 }
