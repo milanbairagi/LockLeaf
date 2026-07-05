@@ -1,0 +1,91 @@
+### LockLeaf API (VS Code REST Client)
+#
+# This file is intended to be committed and shared.
+# - No real tokens are stored here.
+# - Values like username/password are placeholders.
+# - Tokens are captured from API responses at runtime.
+#
+# Requirements:
+# - VS Code extension: "REST Client" (Huachao Mao)
+# - Django server running locally (default): http://localhost:8000/
+
+@url=http://localhost:8000/
+
+# -------------------------
+# Demo credentials (edit)
+# -------------------------
+
+@email=noname@example.com
+@password=noname123
+
+# =====================================================================
+# 1) Accounts
+# =====================================================================
+
+### Register (run once)
+# Note: If the user already exists, this may return 400.
+# @name register
+POST {{url}}accounts/register/
+Content-Type: application/json
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+### Obtain JWT access/refresh tokens
+# @name token
+POST {{url}}accounts/token/
+Content-Type: application/json
+
+{
+    "email": "{{email}}",
+    "password": "{{password}}"
+}
+
+### Capture tokens from the previous response
+@access = {{token.response.body.access}}
+@refresh = {{token.response.body.refresh}}
+
+### Refresh access token
+# @name token_refresh
+POST {{url}}accounts/token/refresh/
+Content-Type: application/json
+
+{
+    "refresh": "{{refresh}}"
+}
+
+### Get current user profile
+GET {{url}}accounts/me/
+Authorization: Bearer {{access}}
+
+### Get user salt
+GET {{url}}accounts/salt/
+Authorization: Bearer {{access}}
+
+### List vault blobs
+GET {{url}}vaults/blobs/
+Authorization: Bearer {{access}}
+
+### Create vault blob
+POST {{url}}vaults/blobs/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "encrypted_blob": "your_encrypted_blob_here",
+    "iv": "faedffasdfadasdfasdf",
+    "vault_version": 1
+}
+
+### Update vault blob
+PUT {{url}}vaults/blobs/sync/
+Content-Type: application/json
+Authorization: Bearer {{access}}
+
+{
+    "encrypted_blob": "ewogICJuYW1lIjogIk1pbGFuIiwKICAiZ2VuZGVyIjogIk1hbGUiCn0=",
+    "iv": "new_iv_but_it_can't_be_changed",
+    "vault_version": 2
+}
