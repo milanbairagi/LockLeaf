@@ -1,15 +1,15 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, ValidationError
-from .models import Item
+from .models import Vault
 
 
 class VaultSerializer(ModelSerializer):
     iv = serializers.CharField(allow_blank=False, allow_null=False)
 
     class Meta:
-        model = Item
-        fields = ["id", "title", "user", "username", "password", "iv", "url", "notes", "created_at", "updated_at"]
-        read_only_fields = ["user", "created_at", "updated_at"]
+        model = Vault
+        fields = ["id", "user", "encrypted_blob", "iv", "version", "updated_at"]
+        read_only_fields = ["user", "updated_at"]
 
     def validate_iv(self, value):
         if not value or not value.strip():
