@@ -27,7 +27,7 @@ class VaultBlobSyncView(APIView):
             raise ValidationError({"detail": "No vault found for the user."})
 
         # If the client version matches the server version, we can create a new vault entry with the updated data
-        client_version = request.data.get("vault_version", 1)
+        client_version = request.data.get("version", 1)
         if client_version == vault.version:
             data = request.data
             encrypted_blob = data.get("encrypted_blob", vault.encrypted_blob)
@@ -67,6 +67,8 @@ class VaultBlobListCreateView(APIView):
             return Response(cached_response)
 
         vault = Vault.objects.filter(user=request.user).order_by('-version').first()
+        if not vault:
+            raise ValidationError({"detail": "No vault found for the user."})
         serializer = VaultSerializer(vault)
 
         # cache the response for 15 minutes
