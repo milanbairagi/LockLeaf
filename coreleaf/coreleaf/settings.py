@@ -7,13 +7,9 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("DJANGO_SECRET_KEY", default=None)
-VAULT_UNLOCK_SECRET = config("VAULT_UNLOCK_SECRET", default=None)
 
 if not SECRET_KEY:
     raise ValueError("The DJANGO_SECRET_KEY environment variable is not set.")
-
-if not VAULT_UNLOCK_SECRET:
-    raise ValueError("The VAULT_UNLOCK_SECRET environment variable is not set.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
